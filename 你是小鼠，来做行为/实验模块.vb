@@ -230,7 +230,7 @@ Class 声音步骤
 	WithEvents 音频帧输入节点 As AudioFrameInputNode = 音频图.CreateFrameInputNode(音频编码属性)
 	ReadOnly 毫秒数 As UShort
 	ReadOnly 计时器 As New Timer(AddressOf 音频帧输入节点.Stop)
-	ReadOnly 音频帧 As AudioFrame
+	ReadOnly 音频帧 As New AudioFrame(音频图.SamplesPerQuantum * 4)
 
 	Public Overrides Async Function 运行() As Task
 		音频帧输入节点.Start()
@@ -241,7 +241,6 @@ Class 声音步骤
 		音频帧输入节点.Stop()
 		音频帧输入节点.AddOutgoingConnection(音频设备输出节点)
 		Me.毫秒数 = 毫秒数
-		音频帧 = New AudioFrame(音频图.SamplesPerQuantum * 4)
 		Dim 指针 As IntPtr
 		Dim 容量 As UInteger
 		Dim 音频缓冲 As AudioBuffer = 音频帧.LockBuffer(AudioBufferAccessMode.Write)
@@ -259,12 +258,19 @@ Class 声音步骤
 		音频图 = (Await AudioGraph.CreateAsync(New AudioGraphSettings(Render.AudioRenderCategory.Alerts))).Graph
 		音频编码属性 = 音频图.EncodingProperties
 		音频编码属性.ChannelCount = 1
-		音频设备输出节点 = (Await 音频图.CreateDeviceOutputNodeAsync()).DeviceOutputNode
+		Dim 创建音频设备输出节点结果 As CreateAudioDeviceOutputNodeResult = Await 音频图.CreateDeviceOutputNodeAsync()
+		If 创建音频设备输出节点结果.Status = AudioDeviceNodeCreationStatus.Success Then
+			音频设备输出节点 = 创建音频设备输出节点结果.DeviceOutputNode
+		Else
+			Throw 创建音频设备输出节点结果.ExtendedError
+		End If
 		音频图.Start()
 	End Function
 
 	Private Sub 音频帧输入节点_QuantumStarted(sender As AudioFrameInputNode, args As FrameInputNodeQuantumStartedEventArgs) Handles 音频帧输入节点.QuantumStarted
-		sender.AddFrame(音频帧)
+		If 音频帧 IsNot Nothing Then
+			sender.AddFrame(音频帧)
+		End If
 	End Sub
 End Class
 
@@ -461,7 +467,7 @@ Public Module 实验模块
 		End If
 	End Sub
 
-	Async Sub 初始化(监视器 As I监视器, 计分表 As IReadOnlyList(Of 小鼠计分), 亮灯 As Action, 熄灯 As TimerCallback)
+	Async Function 初始化(监视器 As I监视器, 计分表 As IReadOnlyList(Of 小鼠计分), 亮灯 As Action, 熄灯 As TimerCallback) As Task
 		Await 声音步骤.初始化
 		Dim 冷静 As New 冷静步骤(监视器, 计分表, 5000, 10000)
 		Dim 竞速 As New 竞速步骤(1000, 监视器, 计分表, False, True)
@@ -477,5 +483,5 @@ Public Module 实验模块
 			New 会话(True, New 回合重复数 With {.回合 = New 回合类(冷静, 高音, 等待, 蓝光, 奖励), .重复数 = 5}, New 回合重复数 With {.回合 = New 回合类(冷静, 低音, 等待, 蓝光, 惩罚), .重复数 = 5}),
 			New 会话(True, New 回合重复数 With {.回合 = New 回合类(冷静, 高音, 等待, 惩罚), .重复数 = 5}, New 回合重复数 With {.回合 = New 回合类(冷静, 低音, 等待, 奖励), .重复数 = 5})
 		}
-	End Sub
+	End Function
 End Module

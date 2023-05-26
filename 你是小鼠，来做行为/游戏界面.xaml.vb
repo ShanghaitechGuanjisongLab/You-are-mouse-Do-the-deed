@@ -3,6 +3,7 @@
 Imports Windows.System
 Imports Windows.UI
 Imports Windows.UI.Core
+Imports Windows.UI.Popups
 
 Class 按键监视器
 	Implements I监视器
@@ -37,9 +38,6 @@ Public NotInheritable Class 游戏界面
 
 		' 在 InitializeComponent() 调用之后添加任何初始化。
 		计分板.ItemsSource = 计分表
-		Dim 监视器 As New 按键监视器
-		AddHandler 核心窗口.KeyDown, AddressOf 监视器.On按键
-		初始化(监视器, 计分表, AddressOf 亮灯, AddressOf 熄灯)
 	End Sub
 
 	Protected Overrides Sub OnNavigatedTo(e As NavigationEventArgs)
@@ -104,5 +102,23 @@ Public NotInheritable Class 游戏界面
 		继续会话()
 		继续训练.IsEnabled = False
 		暂停训练.IsEnabled = True
+	End Sub
+
+	Private 异常对话框 As New ContentDialog With {.PrimaryButtonText = "重试", .CloseButtonText = "退出"}
+	Private Async Sub 游戏界面_Loaded(sender As Object, e As RoutedEventArgs) Handles Me.Loaded
+		Dim 监视器 As New 按键监视器
+		AddHandler 核心窗口.KeyDown, AddressOf 监视器.On按键
+		Do
+			Try
+				Await 初始化(监视器, 计分表, AddressOf 亮灯, AddressOf 熄灯)
+				Exit Do
+			Catch ex As Exception
+				异常对话框.Title = ex.GetType
+				异常对话框.Content = ex.Message
+			End Try
+			If Await 异常对话框.ShowAsync = ContentDialogResult.None Then
+				Call ApplicationView.GetForCurrentView.TryConsolidateAsync()
+			End If
+		Loop
 	End Sub
 End Class
