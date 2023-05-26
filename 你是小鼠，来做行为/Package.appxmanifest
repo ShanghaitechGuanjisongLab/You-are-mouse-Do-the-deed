@@ -10,7 +10,7 @@
   <Identity
     Name="You-are-mouse-do-the-deed"
     Publisher="CN=张天夫"
-    Version="1.0.0.0" />
+    Version="1.0.1.0" />
 
   <mp:PhoneIdentity PhoneProductId="7c708054-7d3d-41e7-8a4f-be92cf4050f4" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 

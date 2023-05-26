@@ -56,9 +56,9 @@ Class 冷静步骤
 	ReadOnly 计时器 As New Timer(AddressOf 步骤结束)
 
 	Private Sub 监视器_按键(按键 As VirtualKey)
-		计时器.Change(本次等待时间, Timeout.Infinite)
 		Dim 鼠号 As SByte = 小鼠定位(按键, 计分表)
 		If 鼠号 >= 0 Then
+			计时器.Change(本次等待时间, Timeout.Infinite)
 			For a As Byte = 0 To 计分表.Count - 1
 				If a <> 鼠号 Then
 					计分表(a).加分(1)

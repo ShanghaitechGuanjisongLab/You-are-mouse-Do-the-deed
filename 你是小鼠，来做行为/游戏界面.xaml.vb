@@ -105,6 +105,7 @@ Public NotInheritable Class 游戏界面
 	End Sub
 
 	Private 异常对话框 As New ContentDialog With {.PrimaryButtonText = "重试", .CloseButtonText = "退出"}
+
 	Private Async Sub 游戏界面_Loaded(sender As Object, e As RoutedEventArgs) Handles Me.Loaded
 		Dim 监视器 As New 按键监视器
 		AddHandler 核心窗口.KeyDown, AddressOf 监视器.On按键
