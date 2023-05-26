@@ -1,0 +1,14 @@
+﻿<Page
+    x:Class="你是小鼠_来做行为.添加玩家"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:你是小鼠_来做行为"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+	<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+		<TextBox Header="玩家行动键（用按键来模拟小鼠的行动，每只鼠一个键）：" x:Name="玩家行动键" InputScope="AlphanumericHalfWidth"/>
+		<TextBlock x:Name="报错" Foreground="Red"/>
+		<Button Content="开始训行为" x:Name="开始训行为"/>
+	</StackPanel>
+</Page>
